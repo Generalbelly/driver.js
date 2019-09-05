@@ -63,7 +63,7 @@ export default class Overlay {
     }
 
     // If highlighted element is not changed from last time
-    if (element.isSame(this.highlightedElement)) {
+    if (element.node !== 'modal' && element.isSame(this.highlightedElement)) {
       return;
     }
 
@@ -79,10 +79,12 @@ export default class Overlay {
       this.highlightedElement.onDeselected();
     }
 
-    // get the position of element around which we need to draw
-    const position = element.getCalculatedPosition();
-    if (!position.canHighlight()) {
-      return;
+    if (element.node !== 'modal') {
+      // get the position of element around which we need to draw
+      const position = element.getCalculatedPosition();
+      if (!position.canHighlight()) {
+        return;
+      }
     }
 
     this.lastHighlightedElement = this.highlightedElement;

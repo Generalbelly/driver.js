@@ -7,6 +7,7 @@ import {
   CLASS_PREV_STEP_BTN,
   ESC_KEY_CODE,
   ID_POPOVER,
+  IS_EDITABLE,
   LEFT_KEY_CODE,
   OVERLAY_OPACITY,
   OVERLAY_PADDING,
@@ -28,6 +29,7 @@ export default class Driver {
    */
   constructor(options = {}) {
     this.options = {
+      editable: IS_EDITABLE,
       animate: SHOULD_ANIMATE_OVERLAY, // Whether to animate or not
       opacity: OVERLAY_OPACITY,    // Overlay opacity
       padding: OVERLAY_PADDING,    // Spacing around the element from the overlay
@@ -121,7 +123,10 @@ export default class Driver {
     const highlightedElement = this.overlay.getHighlightedElement();
     const popover = this.document.getElementById(ID_POPOVER);
 
-    const clickedHighlightedElement = highlightedElement.node.contains(e.target);
+    let clickedHighlightedElement = false;
+    if (highlightedElement.node !== 'modal') {
+      clickedHighlightedElement = highlightedElement.node.contains(e.target);
+    }
     const clickedPopover = popover && popover.contains(e.target);
 
     // Perform the 'Next' operation when clicked outside the highlighted element
@@ -318,7 +323,7 @@ export default class Driver {
    */
   hasHighlightedElement() {
     const highlightedElement = this.overlay.getHighlightedElement();
-    return highlightedElement && highlightedElement.node;
+    return highlightedElement && (highlightedElement.node || highlightedElement.node === 'modal');
   }
 
   /**
@@ -375,7 +380,7 @@ export default class Driver {
     // then grab the options and element from the definition
     const isStepDefinition = typeof currentStep !== 'string' && !isDomElement(currentStep);
 
-    if (!currentStep || (isStepDefinition && !currentStep.element)) {
+    if (currentStep !== 'modal' && (!currentStep || (isStepDefinition && !currentStep.element))) {
       throw new Error(`Element is required in step ${index}`);
     }
 
@@ -384,15 +389,18 @@ export default class Driver {
       elementOptions = { ...this.options, ...currentStep };
     }
 
-    // If the given element is a query selector or a DOM element?
-    const domElement = isDomElement(querySelector) ? querySelector : this.document.querySelector(querySelector);
-    if (!domElement) {
-      console.warn(`Element to highlight ${querySelector} not found`);
-      return null;
+    let domElement = 'modal';
+    if (currentStep.element !== 'modal') {
+      // If the given element is a query selector or a DOM element?
+      domElement = isDomElement(querySelector) ? querySelector : this.document.querySelector(querySelector);
+      if (!domElement) {
+        console.warn(`Element to highlight ${querySelector} not found`);
+        return null;
+      }
     }
 
     let popover = null;
-    if (elementOptions.popover && elementOptions.popover.title) {
+    if (elementOptions.popover && elementOptions.popover.content) {
       const mergedClassNames = [
         this.options.className,
         elementOptions.popover.className,

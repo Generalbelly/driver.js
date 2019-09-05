@@ -62,6 +62,7 @@ export default class Stage extends Element {
     this.node.style.top = '0';
     this.node.style.bottom = '';
     this.node.style.right = '';
+    this.node.style.outline = '';
   }
 
   /**
@@ -74,19 +75,27 @@ export default class Stage extends Element {
 
     this.setInitialStyle();
 
-    // Make it two times the padding because, half will be given on left and half on right
-    const requiredPadding = this.options.padding * 2;
+    if (position) {
+      // Make it two times the padding because, half will be given on left and half on right
+      const requiredPadding = this.options.padding * 2;
 
-    const width = (position.right - position.left) + (requiredPadding);
-    const height = (position.bottom - position.top) + (requiredPadding);
+      const width = (position.right - position.left) + (requiredPadding);
+      const height = (position.bottom - position.top) + (requiredPadding);
 
-    // Show the stage
-    this.node.style.display = 'block';
-    this.node.style.position = 'absolute';
-    this.node.style.width = `${width}px`;
-    this.node.style.height = `${height}px`;
-    this.node.style.top = `${position.top - (requiredPadding / 2)}px`;
-    this.node.style.left = `${position.left - (requiredPadding / 2)}px`;
-    this.node.style.backgroundColor = this.options.stageBackground;
+      // Show the stage
+      this.node.style.display = 'block';
+      this.node.style.position = 'absolute';
+      this.node.style.width = `${width}px`;
+      this.node.style.height = `${height}px`;
+      this.node.style.top = `${position.top - (requiredPadding / 2)}px`;
+      this.node.style.left = `${position.left - (requiredPadding / 2)}px`;
+      this.node.style.backgroundColor = this.options.stageBackground;
+    } else {
+      this.node.style.display = 'block';
+      this.node.style.width = '0';
+      this.node.style.height = '0';
+      this.node.style.backgroundColor = this.options.stageBackground;
+      this.node.style.outline = `rgba(0, 0, 0, 0.75) solid ${this.getFullPageSize().height}px`;
+    }
   }
 }

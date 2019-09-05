@@ -14,7 +14,7 @@ import Position from './position';
 export default class Element {
   /**
    * DOM element object
-   * @param {Node|HTMLElement} node
+   * @param {Node|HTMLElement|string} node
    * @param {Object} options
    * @param {Popover} popover
    * @param {Stage} stage
@@ -114,6 +114,7 @@ export default class Element {
    * @return {Position}
    */
   getCalculatedPosition() {
+    if (this.node === 'modal') return null;
     const body = this.document.body;
     const documentElement = this.document.documentElement;
     const window = this.window;
@@ -190,18 +191,22 @@ export default class Element {
    * @public
    */
   onHighlighted() {
-    const highlightedElement = this;
-    if (!highlightedElement.isInView()) {
-      highlightedElement.bringInView();
+    if (this.node === 'modal') {
+      this.showPopover();
+      this.showStage();
+    } else {
+      const highlightedElement = this;
+      if (!highlightedElement.isInView()) {
+        highlightedElement.bringInView();
+      }
+
+      // Show the popover and stage once the item has been
+      // brought in the view, this would allow us to handle
+      // the cases where the container has scroll overflow
+      this.showPopover();
+      this.showStage();
+      this.addHighlightClasses();
     }
-
-    // Show the popover and stage once the item has been
-    // brought in the view, this would allow us to handle
-    // the cases where the container has scroll overflow
-    this.showPopover();
-    this.showStage();
-    this.addHighlightClasses();
-
     if (this.options.onHighlighted) {
       this.options.onHighlighted(this);
     }
@@ -212,6 +217,7 @@ export default class Element {
    * @private
    */
   removeHighlightClasses() {
+    if (this.node === 'modal') return;
     this.node.classList.remove(CLASS_DRIVER_HIGHLIGHTED_ELEMENT);
     this.node.classList.remove(CLASS_POSITION_RELATIVE);
 
@@ -227,6 +233,7 @@ export default class Element {
    * @private
    */
   addHighlightClasses() {
+    if (this.node === 'modal') return;
     this.node.classList.add(CLASS_DRIVER_HIGHLIGHTED_ELEMENT);
 
     // Don't make relative if element already has some position set

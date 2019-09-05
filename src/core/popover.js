@@ -1,13 +1,13 @@
+import pell from 'pell';
 import Element from './element';
 import {
   CLASS_BTN_DISABLED,
   CLASS_CLOSE_BTN,
   CLASS_CLOSE_ONLY_BTN,
   CLASS_NEXT_STEP_BTN,
-  CLASS_POPOVER_DESCRIPTION,
+  CLASS_POPOVER_CONTENT,
   CLASS_POPOVER_FOOTER,
   CLASS_POPOVER_TIP,
-  CLASS_POPOVER_TITLE,
   CLASS_PREV_STEP_BTN,
   ID_POPOVER,
   POPOVER_HTML,
@@ -60,8 +60,7 @@ export default class Popover extends Element {
 
     this.node = popover;
     this.tipNode = popover.querySelector(`.${CLASS_POPOVER_TIP}`);
-    this.titleNode = popover.querySelector(`.${CLASS_POPOVER_TITLE}`);
-    this.descriptionNode = popover.querySelector(`.${CLASS_POPOVER_DESCRIPTION}`);
+    this.contentNode = popover.querySelector(`.${CLASS_POPOVER_CONTENT}`);
     this.footerNode = popover.querySelector(`.${CLASS_POPOVER_FOOTER}`);
     this.nextBtnNode = popover.querySelector(`.${CLASS_NEXT_STEP_BTN}`);
     this.prevBtnNode = popover.querySelector(`.${CLASS_PREV_STEP_BTN}`);
@@ -69,21 +68,12 @@ export default class Popover extends Element {
   }
 
   /**
-   * Gets the title node for the popover
+   * Gets the content node for the popover
    * @returns {Element | null | *}
    * @public
    */
-  getTitleNode() {
-    return this.titleNode;
-  }
-
-  /**
-   * Gets the description node for the popover
-   * @returns {Element | null | *}
-   * @public
-   */
-  getDescriptionNode() {
-    return this.descriptionNode;
+  getContentNode() {
+    return this.contentNode;
   }
 
   /**
@@ -109,6 +99,7 @@ export default class Popover extends Element {
     this.node.style.top = '0';
     this.node.style.bottom = '';
     this.node.style.right = '';
+    this.node.style.position = '';
 
     // Remove the positional classes from tip
     this.node
@@ -125,9 +116,12 @@ export default class Popover extends Element {
     this.attachNode();
     this.setInitialState();
 
-    // Set the title and descriptions
-    this.titleNode.innerHTML = this.options.title;
-    this.descriptionNode.innerHTML = this.options.description || '';
+    // Set the content
+    if (this.options.editable) {
+      this.attachPell(this.contentNode, this.options.content);
+    } else {
+      this.contentNode.innerHTML = this.options.content;
+    }
 
     this.renderFooter();
 
@@ -192,6 +186,20 @@ export default class Popover extends Element {
    * @private
    */
   renderFooter() {
+    if (this.options.editable) {
+      this.footerNode.style.display = 'block';
+      this.closeBtnNode.style.display = 'none';
+      this.prevBtnNode.innerHTML = 'Cancel';
+      this.nextBtnNode.innerHTML = 'Save';
+      this.nextBtnNode.classList.add('driver-save-btn');
+      this.prevBtnNode.classList.add('driver-cancel-btn');
+      this.nextBtnNode.style.display = 'inline-block';
+      this.prevBtnNode.style.display = 'inline-block';
+      return;
+    }
+    this.nextBtnNode.classList.remove('driver-save-btn');
+    this.prevBtnNode.classList.remove('driver-cancel-btn');
+
     this.nextBtnNode.innerHTML = this.options.nextBtnText;
     this.prevBtnNode.innerHTML = this.options.prevBtnText;
     this.closeBtnNode.innerHTML = this.options.closeBtnText;
@@ -482,6 +490,28 @@ export default class Popover extends Element {
     this.tipNode.classList.add('mid-center');
   }
 
+  positionOnMidCenterInScreen() {
+    const window = this.window;
+
+    const top = window.screen.height / 2;
+    const left = window.screen.width / 2;
+
+    const popoverDimensions = this.getSize();
+    const popoverHeight = popoverDimensions.height;
+    const popoverWidth = popoverDimensions.width / 2;
+    const popoverCenter = popoverHeight / 2;
+
+    const topCenterPosition = top - popoverCenter;
+    const leftWidthPosition = left - popoverWidth;
+    this.node.style.top = `${topCenterPosition}px`;
+    this.node.style.left = `${leftWidthPosition}px`;
+    this.node.style.right = '';
+    this.node.style.bottom = '';
+    this.node.style.position = 'fixed';
+
+    this.tipNode.classList.add('mid-center-in-screen');
+  }
+
   /**
    * Automatically positions the popover around the given position
    * such that the element and popover remain in view
@@ -495,15 +525,52 @@ export default class Popover extends Element {
 
     const pageHeight = pageSize.height;
     const popoverHeight = popoverSize.height;
-    const popoverMargin = this.options.padding + 10;  // adding 10 to give it a little distance from the element
 
-    const pageHeightAfterPopOver = elementPosition.bottom + popoverHeight + popoverMargin;
+    if (elementPosition) {
+      const popoverMargin = this.options.padding + 10;  // adding 10 to give it a little distance from the element
 
-    // If adding popover would go out of the window height, then show it to the top
-    if (pageHeightAfterPopOver >= pageHeight) {
-      this.positionOnTop(elementPosition);
+      const pageHeightAfterPopOver = elementPosition.bottom + popoverHeight + popoverMargin;
+
+      // If adding popover would go out of the window height, then show it to the top
+      if (pageHeightAfterPopOver >= pageHeight) {
+        this.positionOnTop(elementPosition);
+      } else {
+        this.positionOnBottom(elementPosition);
+      }
     } else {
-      this.positionOnBottom(elementPosition);
+      this.positionOnMidCenterInScreen();
     }
+  }
+
+  isPellAttched(node) {
+    if (node.childNodes.length === 0) return false;
+    return !!Array.from(node.childNodes).find(n => n.classList.contains('pell-actionbar'));
+  }
+
+  attachPell(node, initialContent = '') {
+    this.contentNode.innerHTML = '';
+    if (!this.isPellAttched(node)) {
+      this.editor = pell.init({
+        element: node,
+        onChange: (html) => { this.contentNode.input = html; },
+        actions: [
+          'bold',
+          'underline',
+          'strikethrough',
+          'heading1',
+          'heading2',
+          'paragraph',
+          'quote',
+          'olist',
+          'ulist',
+          'line',
+          'link',
+        ],
+      });
+    } else {
+      this.editor = node;
+    }
+    this.contentNode.input = initialContent;
+    this.editor.content.innerHTML = initialContent;
   }
 }
