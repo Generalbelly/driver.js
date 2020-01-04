@@ -95,7 +95,7 @@ export default class Stage extends Element {
       this.node.style.width = '0';
       this.node.style.height = '0';
       this.node.style.backgroundColor = this.options.stageBackground;
-      this.node.style.outline = `rgba(0, 0, 0, 0.75) solid ${this.getFullPageSize().height}px`;
+      // this.node.style.outline = `rgba(0, 0, 0, 0.75) solid ${this.getFullPageSize().height}px`;
     }
   }
 }

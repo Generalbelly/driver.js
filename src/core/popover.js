@@ -495,14 +495,9 @@ export default class Popover extends Element {
 
     const top = window.screen.height / 2;
     const left = window.screen.width / 2;
-
     const popoverDimensions = this.getSize();
-    const popoverHeight = popoverDimensions.height;
-    const popoverWidth = popoverDimensions.width / 2;
-    const popoverCenter = popoverHeight / 2;
-
-    const topCenterPosition = top - popoverCenter;
-    const leftWidthPosition = left - popoverWidth;
+    const topCenterPosition = top - popoverDimensions.height;
+    const leftWidthPosition = left - popoverDimensions.width / 2;
     this.node.style.top = `${topCenterPosition}px`;
     this.node.style.left = `${leftWidthPosition}px`;
     this.node.style.right = '';
