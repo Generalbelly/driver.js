@@ -5,19 +5,21 @@
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg" />
   </a>
   <a href="https://npmjs.org/package/driver.js">
-    <img src="https://badge.fury.io/js/driver.js.svg" alt="version" />
+    <img src="https://img.shields.io/npm/v/driver.js.svg" alt="version" />
+  </a>
+  <a href="https://npmjs.org/package/driver.js">
+    <img src="https://img.shields.io/npm/dt/driver.js.svg" alt="downloads" />
   </a>
 </p>
 
 <p align="center">
-  <b>Powerful yet light-weight, vanilla JavaScript engine to drive the user's focus across the page</b></br>
-  <sub>Only ~4kb, no external dependency, supports all major browsers and highly customizable <sub>
+  <b>Powerful, highly customizable vanilla JavaScript engine to drive the user's focus across the page</b></br>
+  <sub>No external dependencies, supports all major browsers and highly customizable <sub>
 </p>
 
 <br />
 
 * **Simple**: is simple to use and has no external dependency at all
-* **Light-weight**: ~4kb in size, vanilla JavaScript and no external dependency
 * **Highly customizable**: has a powerful API and can be used however you want
 * **Highlight anything**: highlight any (literally any) element on page
 * **Feature introductions**: create powerful feature introductions for your web applications
@@ -253,6 +255,9 @@ const driver = new Driver({
   showButtons: false,               // Do not show control buttons in footer
   keyboardControl: true,            // Allow controlling through keyboard (escape to close, arrow keys to move)
   scrollIntoViewOptions: {},        // We use `scrollIntoView()` when possible, pass here the options for it if you want any
+  xCloseButton: false, // Put the close button as an X on the top right corner of popover
+  showCounter: false, // Enables the steps counter
+  counterTemplate: '{current} of {total}', // Template of steps counter
   onHighlightStarted: (Element) => {}, // Called when element is about to be highlighted
   onHighlighted: (Element) => {},      // Called when element is fully highlighted
   onDeselected: (Element) => {},       // Called when element has been deselected

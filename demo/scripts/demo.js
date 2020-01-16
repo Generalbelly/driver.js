@@ -205,65 +205,25 @@ document.addEventListener('DOMContentLoaded', function () {
     padding: 0,
   });
 
-  document.querySelector('#position-btn-left')
+  document.querySelector('#position-btns')
     .addEventListener('click', (e) => {
       e.preventDefault();
 
+      let id = e.target.id;
+      let alignment = e.target.dataset.alignment;
+
+      if (!alignment) return;
+
       positionBtnsDriver.highlight({
-        element: '#position-btn-left',
+        element: `#${id}`,
         showButtons: false,
         popover: {
           title: 'Did you know?',
           description: 'You can add HTML in title or description also!',
-          position: 'left'
+          position: alignment
         }
       });
-    });
-
-  document.querySelector('#position-btn-right')
-    .addEventListener('click', (e) => {
-      e.preventDefault();
-
-      positionBtnsDriver.highlight({
-        element: '#position-btn-right',
-        showButtons: false,
-        popover: {
-          title: 'Did you know?',
-          description: 'You can add HTML in title or description also!',
-          position: 'right'
-        }
-      });
-    });
-
-  document.querySelector('#position-btn-bottom')
-    .addEventListener('click', (e) => {
-      e.preventDefault();
-
-      positionBtnsDriver.highlight({
-        element: '#position-btn-bottom',
-        showButtons: false,
-        popover: {
-          title: 'Did you know?',
-          description: 'You can add HTML in title or description also!',
-          position: 'bottom'
-        }
-      });
-    });
-
-  document.querySelector('#position-btn-top')
-    .addEventListener('click', (e) => {
-      e.preventDefault();
-
-      positionBtnsDriver.highlight({
-        element: '#position-btn-top',
-        showButtons: false,
-        popover: {
-          title: 'Did you know?',
-          description: 'You can add HTML in title or description also!',
-          position: 'top'
-        }
-      });
-    });
+    })
 
 /////////////////////////////////////////////////////
 // Highlighting single element with popover position
@@ -335,6 +295,52 @@ document.addEventListener('DOMContentLoaded', function () {
       e.preventDefault();
       singleNoClose.start();
     });
+
+
+/////////////////////////////////////////////
+// Introduction showing steps counter
+/////////////////////////////////////////////
+  const showCounter = new Driver({
+    showCounter: true,
+    counterTemplate: '{current} of {total}',
+    xCloseButton: true,
+  });
+
+  showCounter.defineSteps([
+    {
+      element: '#first-element-introduction-with-counter',
+      popover: {
+        className: 'first-step-popover-class',
+        title: 'First step of introduction',
+        description: 'Body of the popover',
+        position: 'top'
+      }
+    },
+    {
+      element: '#second-element-introduction-with-counter',
+      popover: {
+        title: 'Second step of introduction',
+        description: 'Body of the popover',
+        position: 'top'
+      }
+    },
+    {
+      element: '#third-element-introduction-with-counter',
+      popover: {
+        title: 'Third step of introduction',
+        description: 'Body of the popover',
+        position: 'top'
+      }
+    }
+  ]);
+
+  document.querySelector('#run-show-counter-in-popover')
+    .addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      showCounter.start();
+    });
+
 
 /////////////////////////////////////////////////////
 // Highlighting single element with popover position
