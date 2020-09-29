@@ -197,6 +197,7 @@ export default class Popover extends Element {
       this.prevBtnNode.classList.add('driver-cancel-btn');
       this.nextBtnNode.style.display = 'inline-block';
       this.prevBtnNode.style.display = 'inline-block';
+      this.counterNode.style.display = 'none';
       return;
     }
     this.nextBtnNode.classList.remove('driver-save-btn');

@@ -1,6 +1,8 @@
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const webpack = require('webpack');
+const pjson = require('../package.json');
 
 module.exports = {
   mode: 'production',
@@ -70,6 +72,9 @@ module.exports = {
         ],
       },
       canPrint: true,
+    }),
+    new webpack.BannerPlugin({
+      banner: `${pjson.name} | ${pjson.author} | license: ${pjson.license}`,
     }),
   ],
   stats: {
